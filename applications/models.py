@@ -30,7 +30,7 @@ class JobApplication(models.Model):
         help_text="e.g. LinkedIn, Indeed, Company Website",
     )
     job_url = models.URLField(blank=True, null=True, help_text="Job ads link")
-    applied_at = models.DateField(
+    applied_at = models.DateTimeField(
         blank=True,
         null=True,
         help_text="Date the application was submitted",
