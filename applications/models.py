@@ -123,10 +123,10 @@ class Interview(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["scheduled_at"]
-        unique_together = ("application", "round_number")
+        ordering = ["interview_date"]
+        unique_together = ("application", "round")
         indexes = [
-            models.Index(fields=["scheduled_at"]),
-            models.Index(fields=["outcome"]),
+            models.Index(fields=["interview_date"]),
+            models.Index(fields=["interview_status"]),
         ]
 
