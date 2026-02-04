@@ -2,6 +2,14 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+class ApplicationStatus(models.TextChoices):
+    SAVED = "saved", "Saved"
+    APPLIED = "applied", "Applied"
+    INTERVIEW = "interview", "Interview"
+    OFFER = "offer", "Offer"
+    REJECTED = "rejected", "Rejected"
+    GHOSTED = "ghosted", "Ghosted"
+
 
 class JobApplication(models.Model):
     class JobMatchScore(models.IntegerChoices):
@@ -10,14 +18,6 @@ class JobApplication(models.Model):
         THREE = 3, _("Fit some criteria, worth a try")
         FOUR  = 4, _("It's a match!")
         FIVE  = 5, _("The perfect dream job")
-
-    class Status(models.TextChoices):
-        SAVED = "saved", "Saved"
-        APPLIED = "applied", "Applied"
-        INTERVIEW = "interview", "Interview"
-        OFFER = "offer", "Offer"
-        REJECTED = "rejected", "Rejected"
-        GHOSTED = "ghosted", "Ghosted"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -42,8 +42,8 @@ class JobApplication(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=Status,
-        default=Status.SAVED,
+        choices=ApplicationStatus,
+        default=ApplicationStatus.SAVED,
     )
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,4 +54,79 @@ class JobApplication(models.Model):
         return f"{self.job_title} @ {self.company_name}"
 
 
+class ApplicationStatusHistory(models.Model):
+    application = models.ForeignKey(
+        "JobApplication", 
+        on_delete=models.CASCADE,
+        related_name="status_history"
+    )
+    from_status = models.CharField(
+        max_length=20,
+        choices=ApplicationStatus
+    )
+    to_status = models.CharField(
+        max_length=20,
+        choices=ApplicationStatus,
+    )
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="application_status_changes",
+        help_text="User who triggered the status change",
+    )
+    changed_at = models.DateTimeField(auto_now_add=True)
+    
+
+class Interview(models.Model):
+    class InterviewType(models.TextChoices):
+        PHONE = "phone", "Phone Screen"
+        TECHNICAL = "technical", "Technical"
+        BEHAVIORAL = "behavioral", "Behavioral"
+        ONSITE = "onsite", "Onsite"
+        FINAL = "final", "Final"
+
+    class InterviewStatus(models.TextChoices):
+        UPCOMING = "upcoming", "Upcoming"
+        PENDING = "pending", "Pending"
+        PASS = "pass", "Pass"
+        FAIL = "fail", "Fail"
+
+
+    application = models.ForeignKey(
+        "JobApplication", 
+        on_delete=models.CASCADE,
+        related_name="interviews"
+    )
+    interview_type = models.CharField(
+        max_length=20,
+        choices=InterviewType.choices,
+    )
+    round = models.PositiveSmallIntegerField(
+        help_text="Interview round number (1, 2, 3...)"
+    )
+    interview_date = models.DateTimeField()
+    interviewer = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Interviewer name(s)",
+    )
+    interview_notes = models.TextField(blank=True, null=True)
+    interview_status = models.CharField(
+        max_length=20,
+        choices=InterviewStatus.choices,
+        default="upcoming",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["scheduled_at"]
+        unique_together = ("application", "round_number")
+        indexes = [
+            models.Index(fields=["scheduled_at"]),
+            models.Index(fields=["outcome"]),
+        ]
 
