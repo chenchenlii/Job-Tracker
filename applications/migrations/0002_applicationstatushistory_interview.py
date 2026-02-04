@@ -8,40 +8,151 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0001_initial'),
+        ("applications", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ApplicationStatusHistory',
+            name="ApplicationStatusHistory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('from_status', models.CharField(choices=[('saved', 'Saved'), ('applied', 'Applied'), ('interview', 'Interview'), ('offer', 'Offer'), ('rejected', 'Rejected'), ('ghosted', 'Ghosted')], max_length=20)),
-                ('to_status', models.CharField(choices=[('saved', 'Saved'), ('applied', 'Applied'), ('interview', 'Interview'), ('offer', 'Offer'), ('rejected', 'Rejected'), ('ghosted', 'Ghosted')], max_length=20)),
-                ('changed_at', models.DateTimeField(auto_now_add=True)),
-                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='status_history', to='applications.jobapplication')),
-                ('changed_by', models.ForeignKey(blank=True, help_text='User who triggered the status change', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='application_status_changes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "from_status",
+                    models.CharField(
+                        choices=[
+                            ("saved", "Saved"),
+                            ("applied", "Applied"),
+                            ("interview", "Interview"),
+                            ("offer", "Offer"),
+                            ("rejected", "Rejected"),
+                            ("ghosted", "Ghosted"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "to_status",
+                    models.CharField(
+                        choices=[
+                            ("saved", "Saved"),
+                            ("applied", "Applied"),
+                            ("interview", "Interview"),
+                            ("offer", "Offer"),
+                            ("rejected", "Rejected"),
+                            ("ghosted", "Ghosted"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("changed_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "application",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="status_history",
+                        to="applications.jobapplication",
+                    ),
+                ),
+                (
+                    "changed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="User who triggered the status change",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="application_status_changes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Interview',
+            name="Interview",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('interview_type', models.CharField(choices=[('phone', 'Phone Screen'), ('technical', 'Technical'), ('behavioral', 'Behavioral'), ('onsite', 'Onsite'), ('final', 'Final')], max_length=20)),
-                ('round', models.PositiveSmallIntegerField(help_text='Interview round number (1, 2, 3...)')),
-                ('interview_date', models.DateTimeField()),
-                ('interviewer', models.CharField(blank=True, help_text='Interviewer name(s)', max_length=255, null=True)),
-                ('interview_notes', models.TextField(blank=True, null=True)),
-                ('interview_status', models.CharField(choices=[('upcoming', 'Upcoming'), ('pending', 'Pending'), ('pass', 'Pass'), ('fail', 'Fail')], default='upcoming', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='interviews', to='applications.jobapplication')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "interview_type",
+                    models.CharField(
+                        choices=[
+                            ("phone", "Phone Screen"),
+                            ("technical", "Technical"),
+                            ("behavioral", "Behavioral"),
+                            ("onsite", "Onsite"),
+                            ("final", "Final"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "round",
+                    models.PositiveSmallIntegerField(
+                        help_text="Interview round number (1, 2, 3...)"
+                    ),
+                ),
+                ("interview_date", models.DateTimeField()),
+                (
+                    "interviewer",
+                    models.CharField(
+                        blank=True,
+                        help_text="Interviewer name(s)",
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
+                ("interview_notes", models.TextField(blank=True, null=True)),
+                (
+                    "interview_status",
+                    models.CharField(
+                        choices=[
+                            ("upcoming", "Upcoming"),
+                            ("pending", "Pending"),
+                            ("pass", "Pass"),
+                            ("fail", "Fail"),
+                        ],
+                        default="upcoming",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "application",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="interviews",
+                        to="applications.jobapplication",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['interview_date'],
-                'indexes': [models.Index(fields=['interview_date'], name='application_intervi_c2cb3a_idx'), models.Index(fields=['interview_status'], name='application_intervi_c02e67_idx')],
-                'unique_together': {('application', 'round')},
+                "ordering": ["interview_date"],
+                "indexes": [
+                    models.Index(
+                        fields=["interview_date"], name="application_intervi_c2cb3a_idx"
+                    ),
+                    models.Index(
+                        fields=["interview_status"],
+                        name="application_intervi_c02e67_idx",
+                    ),
+                ],
+                "unique_together": {("application", "round")},
             },
         ),
     ]

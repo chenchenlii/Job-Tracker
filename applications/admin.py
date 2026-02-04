@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import ApplicationStatusHistory, JobApplication, Interview
 
 
-
 class ApplicationStatusHistoryAdmin(admin.ModelAdmin):
     list_display = (
         "application",
@@ -98,4 +97,3 @@ class JobApplicationAdmin(admin.ModelAdmin):
 admin.site.register(ApplicationStatusHistory, ApplicationStatusHistoryAdmin)
 admin.site.register(Interview, InterviewAdmin)
 admin.site.register(JobApplication, JobApplicationAdmin)
-

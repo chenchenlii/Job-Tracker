@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class ApplicationStatus(models.TextChoices):
     SAVED = "saved", "Saved"
     APPLIED = "applied", "Applied"
@@ -13,16 +14,13 @@ class ApplicationStatus(models.TextChoices):
 
 class JobApplication(models.Model):
     class JobMatchScore(models.IntegerChoices):
-        ONE   = 1, _("I applied because I'm desperate")
-        TWO   = 2, _("hm... not sure about this")
+        ONE = 1, _("I applied because I'm desperate")
+        TWO = 2, _("hm... not sure about this")
         THREE = 3, _("Fit some criteria, worth a try")
-        FOUR  = 4, _("It's a match!")
-        FIVE  = 5, _("The perfect dream job")
+        FOUR = 4, _("It's a match!")
+        FIVE = 5, _("The perfect dream job")
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=250)
     company_name = models.CharField(max_length=250)
     platform = models.CharField(
@@ -38,7 +36,7 @@ class JobApplication(models.Model):
     match_sore = models.IntegerField(
         choices=JobMatchScore.choices,
         default=JobMatchScore.ONE,
-        help_text="How well do you think this job suits you"
+        help_text="How well do you think this job suits you",
     )
     status = models.CharField(
         max_length=20,
@@ -49,21 +47,15 @@ class JobApplication(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
     def __str__(self):
         return f"{self.job_title} @ {self.company_name}"
 
 
 class ApplicationStatusHistory(models.Model):
     application = models.ForeignKey(
-        "JobApplication", 
-        on_delete=models.CASCADE,
-        related_name="status_history"
+        "JobApplication", on_delete=models.CASCADE, related_name="status_history"
     )
-    from_status = models.CharField(
-        max_length=20,
-        choices=ApplicationStatus
-    )
+    from_status = models.CharField(max_length=20, choices=ApplicationStatus)
     to_status = models.CharField(
         max_length=20,
         choices=ApplicationStatus,
@@ -77,7 +69,7 @@ class ApplicationStatusHistory(models.Model):
         help_text="User who triggered the status change",
     )
     changed_at = models.DateTimeField(auto_now_add=True)
-    
+
 
 class Interview(models.Model):
     class InterviewType(models.TextChoices):
@@ -93,11 +85,8 @@ class Interview(models.Model):
         PASS = "pass", "Pass"
         FAIL = "fail", "Fail"
 
-
     application = models.ForeignKey(
-        "JobApplication", 
-        on_delete=models.CASCADE,
-        related_name="interviews"
+        "JobApplication", on_delete=models.CASCADE, related_name="interviews"
     )
     interview_type = models.CharField(
         max_length=20,
@@ -129,4 +118,3 @@ class Interview(models.Model):
             models.Index(fields=["interview_date"]),
             models.Index(fields=["interview_status"]),
         ]
-
