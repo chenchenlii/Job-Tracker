@@ -1,3 +1,5 @@
+from django import forms
+from django.core import validators
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -10,6 +12,23 @@ class ApplicationStatus(models.TextChoices):
     OFFER = "offer", "Offer"
     REJECTED = "rejected", "Rejected"
     GHOSTED = "ghosted", "Ghosted"
+
+
+class LongURLField(models.TextField):
+    description = "URL field with no length limit"
+
+    def __init__(self, verbose_name=None, name=None, **kwargs):
+        models.TextField.__init__(self, verbose_name, name, **kwargs)
+        self.validators.append(validators.URLValidator())
+
+    def formfield(self, **kwargs):
+        # As with TextField, this will cause URL validation to be performed
+        # twice.
+        defaults = {
+            "form_class": forms.URLField,
+        }
+        defaults.update(kwargs)
+        return super(LongURLField, self).formfield(**defaults)
 
 
 class JobApplication(models.Model):
@@ -27,7 +46,7 @@ class JobApplication(models.Model):
         max_length=100,
         help_text="e.g. LinkedIn, Indeed, Company Website",
     )
-    job_url = models.URLField(blank=True, null=True, help_text="Job ads link")
+    job_url = LongURLField(blank=True, null=True, help_text="Job ads link")
     applied_at = models.DateTimeField(
         blank=True,
         null=True,
