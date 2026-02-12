@@ -3,3 +3,4 @@ black
 django
 django-environ
 psycopg2-binary
+djangorestframework
